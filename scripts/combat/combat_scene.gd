@@ -443,8 +443,8 @@ func _start_player_breathing() -> void:
 		breath_tween.kill()
 
 	breath_tween = create_tween().set_loops()
-	breath_tween.tween_property(player_sprite, "scale", Vector2(0.86, 0.84), 1.2).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-	breath_tween.tween_property(player_sprite, "scale", PLAYER_IDLE_SCALE, 1.2).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	breath_tween.tween_property(player_sprite, "position:y", player_sprite.position.y + 4.0, 1.4).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	breath_tween.tween_property(player_sprite, "position:y", player_sprite.position.y, 1.4).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 
 
 func _animate_player_buff() -> void:

@@ -14,6 +14,13 @@ var current_move_index: int = -1
 var current_intent: Dictionary = {}
 var last_move_index: int = -1
 
+# Idle sprite animation
+var _idle_image: Image = null
+var _idle_hframes: int = 1
+var _idle_timer: float = 0.0
+var _idle_frame_idx: int = 0
+var _sprite_rect: TextureRect = null
+
 @onready var body_container: Control = $BodyContainer
 @onready var body_rect: ColorRect = $BodyContainer/BodyRect
 @onready var head: ColorRect = $BodyContainer/Head
@@ -44,21 +51,75 @@ func setup(data: EnemyData) -> void:
 func _color_body() -> void:
 	if not is_node_ready():
 		await ready
-	var base_color: Color = enemy_data.color
-	var lighter = base_color.lightened(0.15)
-	var darker = base_color.darkened(0.15)
 
-	body_rect.color = base_color
-	head.color = darker
-	$BodyContainer/LeftArm.color = lighter
-	$BodyContainer/RightArm.color = lighter
-	$BodyContainer/LeftLeg.color = darker
-	$BodyContainer/RightLeg.color = darker
+	if enemy_data.idle_sprite_path != "":
+		_show_sprite(enemy_data.idle_sprite_path)
+	else:
+		var base_color: Color = enemy_data.color
+		var lighter = base_color.lightened(0.15)
+		var darker = base_color.darkened(0.15)
+		body_rect.color = base_color
+		head.color = darker
+		$BodyContainer/LeftArm.color = lighter
+		$BodyContainer/RightArm.color = lighter
+		$BodyContainer/LeftLeg.color = darker
+		$BodyContainer/RightLeg.color = darker
 
 	if enemy_data.enemy_type == EnemyData.EnemyType.BOSS:
 		body_container.scale = Vector2(1.4, 1.4)
 	elif enemy_data.enemy_type == EnemyData.EnemyType.ELITE:
 		body_container.scale = Vector2(1.2, 1.2)
+
+
+func _show_sprite(path: String) -> void:
+	for child in body_container.get_children():
+		child.visible = false
+
+	# Load as Image so we can split frames
+	var img: Image
+	if ResourceLoader.exists(path):
+		var t = load(path)
+		if t is Texture2D:
+			img = t.get_image()
+	if not img:
+		img = Image.load_from_file(ProjectSettings.globalize_path(path))
+	if not img or img.is_empty():
+		return
+
+	# Assume square frames (frame width == image height)
+	var fh := img.get_height()
+	_idle_hframes = max(1, img.get_width() / fh)
+	_idle_image = img
+	_idle_frame_idx = 0
+
+	var tex_rect := TextureRect.new()
+	tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tex_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tex_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tex_rect.flip_h = true  # face left toward player
+	_sprite_rect = tex_rect
+	body_container.add_child(tex_rect)
+	_set_sprite_frame(0)
+
+
+func _set_sprite_frame(frame: int) -> void:
+	if not _sprite_rect or not _idle_image:
+		return
+	var fh := _idle_image.get_height()
+	var region := Rect2i(frame * fh, 0, fh, fh)
+	var frame_img := _idle_image.get_region(region)
+	if not frame_img.is_empty():
+		_sprite_rect.texture = ImageTexture.create_from_image(frame_img)
+
+
+func _process(delta: float) -> void:
+	if _sprite_rect and _idle_image and _idle_hframes > 1:
+		_idle_timer += delta
+		if _idle_timer >= 0.12:
+			_idle_timer = 0.0
+			_idle_frame_idx = (_idle_frame_idx + 1) % _idle_hframes
+			_set_sprite_frame(_idle_frame_idx)
 
 
 func _update_visuals() -> void:

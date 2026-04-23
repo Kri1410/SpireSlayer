@@ -52,11 +52,20 @@ func _generate_rewards() -> void:
 	GameManager.add_gold(gold_amount)
 	gold_reward_label.text = "+" + str(gold_amount) + " Gold (Total: " + str(GameManager.gold) + ")"
 
-	# Generate 3 card choices - weighted by rarity
+	# Generate 3 card choices - weighted by rarity, filtered to selected class
+	var class_map := {
+		"ronin": CardData.CardClass.RONIN,
+		"yumi": CardData.CardClass.YUMI,
+		"banner": CardData.CardClass.BANNER,
+	}
+	var player_class: int = class_map.get(GameManager.selected_class, CardData.CardClass.ANY)
 	var available_cards: Array[CardData] = []
 	for card in GameManager.all_cards.values():
-		if card.rarity != CardData.CardRarity.STARTER and card.rarity != CardData.CardRarity.SPECIAL:
-			available_cards.append(card)
+		if card.rarity == CardData.CardRarity.STARTER or card.rarity == CardData.CardRarity.SPECIAL:
+			continue
+		if card.card_class != CardData.CardClass.ANY and card.card_class != player_class:
+			continue
+		available_cards.append(card)
 
 	available_cards.shuffle()
 

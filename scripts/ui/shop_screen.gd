@@ -56,11 +56,20 @@ func _ready() -> void:
 
 
 func _generate_shop_inventory() -> void:
-	# Generate 5 cards for sale
+	# Generate 5 cards for sale — filtered to selected class
+	var class_map := {
+		"ronin": CardData.CardClass.RONIN,
+		"yumi": CardData.CardClass.YUMI,
+		"banner": CardData.CardClass.BANNER,
+	}
+	var player_class: int = class_map.get(GameManager.selected_class, CardData.CardClass.ANY)
 	var available: Array[CardData] = []
 	for card in GameManager.all_cards.values():
-		if card.rarity != CardData.CardRarity.STARTER and card.rarity != CardData.CardRarity.SPECIAL:
-			available.append(card)
+		if card.rarity == CardData.CardRarity.STARTER or card.rarity == CardData.CardRarity.SPECIAL:
+			continue
+		if card.card_class != CardData.CardClass.ANY and card.card_class != player_class:
+			continue
+		available.append(card)
 	available.shuffle()
 
 	var chosen_ids: Array[String] = []

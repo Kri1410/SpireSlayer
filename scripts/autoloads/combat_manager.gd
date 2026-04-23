@@ -98,6 +98,11 @@ func end_player_turn() -> void:
 
 	player_turn = false
 
+	# Steel Plate (Banner): gain block at end of turn
+	var steel_plate = get_player_status("steel_plate")
+	if steel_plate > 0:
+		add_player_block(steel_plate)
+
 	# Discard hand (exhaust ethereal cards)
 	var cards_to_discard = hand.duplicate()
 	for card in cards_to_discard:
@@ -184,11 +189,9 @@ func play_card(card: CardData, target_enemy: Node = null) -> void:
 		_execute_card_effect(card, target_enemy)
 
 	# Handle card destination
-	var was_exhausted = false
 	if card.exhaust:
 		exhaust_pile.append(card)
 		EventBus.card_exhausted.emit(card)
-		was_exhausted = true
 		# Sentinel: gain 2 energy when exhausted
 		if card.id == "sentinel":
 			current_energy += 2
@@ -208,6 +211,17 @@ func _execute_card_effect(card: CardData, target: Node) -> void:
 	var damage = card.get_effective_damage()
 	var block = card.get_effective_block()
 	var magic = card.get_effective_magic()
+
+	# Conditional damage overrides/bonuses (applied before strength/vuln math)
+	match card.id:
+		"killshot":
+			if target and target.has_method("get_status") and target.get_status("vulnerable") > 0:
+				damage += magic
+		"honed_edge":
+			if player_block > 0:
+				damage += magic
+		"true_shot":
+			damage = 2 * hand.size()
 
 	# Apply player strength to damage
 	if damage > 0:
@@ -242,7 +256,7 @@ func _execute_card_effect(card: CardData, target: Node) -> void:
 		"bash":
 			if target and is_instance_valid(target):
 				target.add_status("vulnerable", magic)
-		"clothesline":
+		"clothesline", "onslaught":
 			if target and is_instance_valid(target):
 				target.add_status("weak", magic)
 		"uppercut":
@@ -338,11 +352,58 @@ func _execute_card_effect(card: CardData, target: Node) -> void:
 			for enemy in enemies:
 				if enemy and is_instance_valid(enemy) and not enemy.is_dead:
 					enemy.add_status("vulnerable", magic)
-		"iaido":
+		"iaido", "heart_shot":
 			# Refund 1 energy if the strike killed the target
 			if target and is_instance_valid(target) and target.is_dead:
 				current_energy += 1
 				EventBus.player_energy_changed.emit(current_energy, max_energy)
+
+		# --- YUMI (archer) effects ---
+		"take_aim", "side_step":
+			draw_cards(1)
+		"quick_draw", "steady_aim":
+			draw_cards(magic)
+		"pinning_shot":
+			if target and is_instance_valid(target):
+				target.add_status("vulnerable", magic)
+		"hunters_trap":
+			if target and is_instance_valid(target):
+				target.add_status("vulnerable", magic)
+			draw_cards(1)
+		"wind_slash":
+			if target and is_instance_valid(target) and target.is_dead:
+				draw_cards(2)
+		"eagle_eye":
+			add_player_status("eagle_eye", magic)
+
+		# --- RONIN (swordsman) effects ---
+		"focus_strike":
+			add_player_status("strength", magic)
+		"stoic_stance":
+			add_player_status("strength", magic)
+		"perfect_form":
+			add_player_status("strength", magic)
+		"bushido":
+			add_player_status("bushido", magic)
+
+		# --- BANNER (commander) effects ---
+		"intimidate", "war_shout", "taunt":
+			for enemy in enemies:
+				if enemy and is_instance_valid(enemy) and not enemy.is_dead:
+					enemy.add_status("weak", magic)
+		"battle_cry", "banner_wave", "hunters_mark", "final_command":
+			for enemy in enemies:
+				if enemy and is_instance_valid(enemy) and not enemy.is_dead:
+					enemy.add_status("vulnerable", magic)
+		"iron_will", "rallying_cry", "reinforce", "iron_hide":
+			add_player_status("strength", magic)
+		"crushing_blow":
+			if target and is_instance_valid(target) and target.get_status("vulnerable") > 0:
+				target.add_status("weak", magic)
+		"steel_plate":
+			add_player_status("steel_plate", magic)
+		"war_banner":
+			add_player_status("war_banner", magic)
 
 	# Reaper healing: damage was already dealt to all enemies above
 	if card.id == "reaper":
@@ -409,6 +470,23 @@ func _process_start_of_turn_statuses() -> void:
 	var demon_form = get_player_status("demon_form")
 	if demon_form > 0:
 		add_player_status("strength", demon_form)
+
+	# Bushido (Ronin): gain strength at start of turn
+	var bushido = get_player_status("bushido")
+	if bushido > 0:
+		add_player_status("strength", bushido)
+
+	# Eagle Eye (Yumi): draw extra card at start of turn
+	var eagle_eye = get_player_status("eagle_eye")
+	if eagle_eye > 0:
+		draw_cards(eagle_eye)
+
+	# War Banner (Banner): apply vulnerable to all enemies at start of turn
+	var war_banner = get_player_status("war_banner")
+	if war_banner > 0:
+		for enemy in enemies:
+			if enemy and is_instance_valid(enemy) and not enemy.is_dead:
+				enemy.add_status("vulnerable", war_banner)
 
 	# Remove temporary strength from Rage
 	var temp_str = get_player_status("temp_strength")

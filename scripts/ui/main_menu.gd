@@ -18,8 +18,8 @@ var _ember_timer: float = 0.0
 var _title_time: float = 0.0
 var _selected_class: String = "ronin"
 var _panels: Dictionary = {}
-var _idle_textures: Dictionary = {}
-var _idle_frames: Dictionary = {}
+var _idle_images: Dictionary = {}   # class_id -> Image (full sheet)
+var _idle_frames: Dictionary = {}   # class_id -> int frame count
 var _idle_timer: float = 0.0
 var _idle_frame_index: int = 0
 
@@ -34,7 +34,18 @@ func _ready() -> void:
 			continue
 		var class_id: String = PANEL_IDS[panel_name]
 		_panels[class_id] = panel
-		panel.gui_input.connect(_on_panel_clicked.bind(class_id))
+
+		# Transparent button overlay — more reliable than gui_input on Panel
+		var btn := Button.new()
+		btn.flat = true
+		btn.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		btn.add_theme_color_override("font_color", Color.TRANSPARENT)
+		btn.add_theme_color_override("font_hover_color", Color.TRANSPARENT)
+		btn.add_theme_color_override("font_pressed_color", Color.TRANSPARENT)
+		btn.pressed.connect(_select_class.bind(class_id))
+		panel.add_child(btn)
+
 		_load_panel_sprite(panel, class_id)
 
 	_select_class("ronin")
@@ -50,36 +61,33 @@ func _load_panel_sprite(panel: Panel, class_id: String) -> void:
 	var path: String = cls.get("idle_sprite", "")
 	if path == "":
 		return
-	var tex := _load_texture(path)
-	if not tex:
+	var img := _load_image(path)
+	if not img or img.is_empty():
 		return
-	# Crop to the first frame so the menu shows one figure, not a full sheet
 	var hframes: int = int(cls.get("idle_frames", 1))
-	var img := tex.get_image()
-	if img and hframes > 1:
-		var frame_w := img.get_width() / hframes
-		var frame_img := img.get_region(Rect2i(0, 0, frame_w, img.get_height()))
-		tex = ImageTexture.create_from_image(frame_img)
-	sprite_rect.texture = tex
-	_idle_textures[class_id] = _load_texture(path)  # full sheet for animation
+	_idle_images[class_id] = img
 	_idle_frames[class_id] = hframes
+	# Show frame 0
+	_set_panel_frame(sprite_rect, img, hframes, 0)
 
 
-func _load_texture(path: String) -> Texture2D:
+func _load_image(path: String) -> Image:
 	if ResourceLoader.exists(path):
 		var t = load(path)
 		if t is Texture2D:
-			return t
+			var i = t.get_image()
+			if i:
+				return i
 	var absolute_path := ProjectSettings.globalize_path(path)
-	var image := Image.load_from_file(absolute_path)
-	if image and not image.is_empty():
-		return ImageTexture.create_from_image(image)
-	return null
+	return Image.load_from_file(absolute_path)
 
 
-func _on_panel_clicked(event: InputEvent, class_id: String) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_select_class(class_id)
+func _set_panel_frame(sprite_rect: TextureRect, img: Image, hframes: int, frame: int) -> void:
+	var frame_w := img.get_width() / hframes
+	var region := Rect2i(frame * frame_w, 0, frame_w, img.get_height())
+	var frame_img := img.get_region(region)
+	if not frame_img.is_empty():
+		sprite_rect.texture = ImageTexture.create_from_image(frame_img)
 
 
 func _select_class(class_id: String) -> void:
@@ -87,11 +95,36 @@ func _select_class(class_id: String) -> void:
 	GameManager.selected_class = class_id
 	for cid in _panels:
 		var panel: Panel = _panels[cid]
-		var is_selected := cid == class_id
+		var is_selected: bool = cid == class_id
+
+		# Bright border glow for selected, dim for others
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = Color(0.07, 0.05, 0.09, 0.92)
+		sb.corner_radius_top_left = 14
+		sb.corner_radius_top_right = 14
+		sb.corner_radius_bottom_right = 14
+		sb.corner_radius_bottom_left = 14
+		sb.shadow_color = Color(0, 0, 0, 0.6)
+		sb.shadow_size = 10
+		sb.shadow_offset = Vector2(0, 4)
+		if is_selected:
+			sb.border_width_left = 3
+			sb.border_width_top = 3
+			sb.border_width_right = 3
+			sb.border_width_bottom = 3
+			sb.border_color = Color(0.95, 0.55, 0.15, 1.0)
+		else:
+			sb.border_width_left = 2
+			sb.border_width_top = 2
+			sb.border_width_right = 2
+			sb.border_width_bottom = 2
+			sb.border_color = Color(0.45, 0.18, 0.18, 0.85)
+		panel.add_theme_stylebox_override("panel", sb)
+
+		panel.modulate = Color(1.12, 1.05, 0.88) if is_selected else Color(0.8, 0.75, 0.8)
+		panel.pivot_offset = Vector2(220, 270)  # half of 440x540 minimum size
 		var tween := create_tween()
-		tween.tween_property(panel, "scale", Vector2(1.05, 1.05) if is_selected else Vector2.ONE, 0.18).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-		panel.modulate = Color(1.15, 1.05, 0.9) if is_selected else Color(0.78, 0.74, 0.78)
-		panel.pivot_offset = panel.size / 2.0
+		tween.tween_property(panel, "scale", Vector2(1.06, 1.06) if is_selected else Vector2.ONE, 0.18).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 
 
 func _process(delta: float) -> void:
@@ -111,20 +144,14 @@ func _process(delta: float) -> void:
 		_idle_timer = 0.0
 		_idle_frame_index += 1
 		for class_id in _panels:
-			var sheet: Texture2D = _idle_textures.get(class_id, null)
+			var img: Image = _idle_images.get(class_id, null)
 			var frames: int = int(_idle_frames.get(class_id, 1))
-			if not sheet or frames <= 1:
+			if not img or frames <= 1:
 				continue
 			var sprite_rect: TextureRect = _panels[class_id].get_node_or_null("Sprite")
 			if not sprite_rect:
 				continue
-			var img := sheet.get_image()
-			if not img:
-				continue
-			var frame := _idle_frame_index % frames
-			var frame_w := img.get_width() / frames
-			var frame_img := img.get_region(Rect2i(frame * frame_w, 0, frame_w, img.get_height()))
-			sprite_rect.texture = ImageTexture.create_from_image(frame_img)
+			_set_panel_frame(sprite_rect, img, frames, _idle_frame_index % frames)
 
 
 func _animate_intro() -> void:

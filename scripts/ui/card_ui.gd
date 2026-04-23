@@ -241,8 +241,8 @@ func _on_mouse_entered() -> void:
 		hover_tween.kill()
 	hover_tween = create_tween()
 	hover_tween.set_parallel(true)
-	hover_tween.tween_property(self, "scale", Vector2(1.4, 1.4), 0.12).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
-	hover_tween.tween_property(self, "position", rest_position + Vector2(0, -100), 0.12).set_ease(Tween.EASE_OUT)
+	hover_tween.tween_property(self, "scale", Vector2(1.22, 1.22), 0.22).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	hover_tween.tween_property(self, "position", rest_position + Vector2(0, -70), 0.22).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 	z_index = 100
 	card_hovered.emit(self, true)
 
@@ -256,8 +256,8 @@ func _on_mouse_exited() -> void:
 		hover_tween.kill()
 	hover_tween = create_tween()
 	hover_tween.set_parallel(true)
-	hover_tween.tween_property(self, "scale", Vector2.ONE, 0.1)
-	hover_tween.tween_property(self, "position", rest_position, 0.1).set_ease(Tween.EASE_IN)
+	hover_tween.tween_property(self, "scale", Vector2.ONE, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	hover_tween.tween_property(self, "position", rest_position, 0.2).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 	pivot_offset = Vector2(size.x / 2.0, size.y / 2.0)
 	z_index = original_index
 	hover_tween.finished.connect(_cache_rest_position, CONNECT_ONE_SHOT)

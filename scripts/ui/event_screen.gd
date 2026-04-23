@@ -104,9 +104,21 @@ func _on_choice_selected(choice: Dictionary) -> void:
 			else:
 				result_text = "No cards to upgrade."
 		"gain_random_card":
-			var cards = GameManager.all_cards.values()
-			if cards.size() > 0:
-				var card = cards[randi() % cards.size()].duplicate_card()
+			var class_map := {
+				"ronin": CardData.CardClass.RONIN,
+				"yumi": CardData.CardClass.YUMI,
+				"banner": CardData.CardClass.BANNER,
+			}
+			var player_class: int = class_map.get(GameManager.selected_class, CardData.CardClass.ANY)
+			var pool: Array = []
+			for c in GameManager.all_cards.values():
+				if c.rarity == CardData.CardRarity.STARTER or c.rarity == CardData.CardRarity.SPECIAL:
+					continue
+				if c.card_class != CardData.CardClass.ANY and c.card_class != player_class:
+					continue
+				pool.append(c)
+			if pool.size() > 0:
+				var card = pool[randi() % pool.size()].duplicate_card()
 				GameManager.add_card_to_deck(card)
 				result_text = "Gained " + card.card_name + "!"
 		"chest_gold":

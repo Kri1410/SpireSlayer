@@ -326,6 +326,17 @@ func _create_cards_in_code() -> void:
 	all_cards["rain_of_arrows"] = _make_card("rain_of_arrows", "Rain of Arrows", "Deal {D} damage to ALL enemies three times.", 3, A, RA, AE, 5, 0, 0, 2, false, false, 2, 0, 0, 0, 0, YUM)
 	all_cards["eagle_eye"] = _make_card("eagle_eye", "Eagle Eye", "POWER: At the start of each turn, draw {M} additional card.", 2, P, RA, SL, 0, 0, 1, 0, false, false, 0, 0, 0, 1, 0, YUM)
 	all_cards["true_shot"] = _make_card("true_shot", "True Shot", "Deal damage equal to twice your remaining hand size.\nExhaust.", 0, A, RA, SE, 0, 0, 0, 0, true, false, 0, 0, 0, 0, 0, YUM)
+	# Extended Yumi pool — more build variety (precision / swarm / control)
+	all_cards["piercing_shot"] = _make_card("piercing_shot", "Piercing Shot", "Deal {D} damage.", 1, A, CO, SE, 10, 0, 0, 0, false, false, 4, 0, 0, 0, 0, YUM)
+	all_cards["grazing_shot"] = _make_card("grazing_shot", "Grazing Shot", "Deal {D} damage twice.", 1, A, CO, SE, 3, 0, 0, 1, false, false, 1, 0, 0, 0, 1, YUM)
+	all_cards["arrow_dance"] = _make_card("arrow_dance", "Arrow Dance", "Gain {B} Block.", 1, S, CO, SL, 0, 7, 0, 0, false, false, 0, 3, 0, 0, 0, YUM)
+	all_cards["scout_shot"] = _make_card("scout_shot", "Scout Shot", "Ethereal.\nDeal {D} damage.", 0, A, CO, SE, 5, 0, 0, 0, false, true, 2, 0, 0, 0, 0, YUM)
+	all_cards["double_tap"] = _make_card("double_tap", "Double Tap", "Deal {D} damage twice.", 2, A, UC, SE, 8, 0, 0, 1, false, false, 3, 0, 0, 0, 0, YUM)
+	all_cards["arrowhail"] = _make_card("arrowhail", "Arrowhail", "Deal {D} damage to ALL enemies twice.", 2, A, UC, AE, 5, 0, 0, 1, false, false, 2, 0, 0, 0, 0, YUM)
+	all_cards["bolt_action"] = _make_card("bolt_action", "Bolt Action", "Deal {D} damage.\nGain {B} Block.", 2, A, UC, SE, 12, 3, 0, 0, false, false, 4, 2, 0, 0, 0, YUM)
+	all_cards["hunters_mark"] = _make_card("hunters_mark", "Hunter's Mark", "Apply {M} Vulnerable to ALL enemies.", 0, S, UC, AE, 0, 0, 2, 0, false, false, 0, 0, 0, 1, 0, YUM)
+	all_cards["arrow_storm"] = _make_card("arrow_storm", "Arrow Storm", "Deal {D} damage to ALL enemies three times.", 3, A, RA, AE, 5, 0, 0, 2, false, false, 2, 0, 0, 0, 0, YUM)
+	all_cards["heart_shot"] = _make_card("heart_shot", "Heart Shot", "Deal {D} damage.\nIf Fatal, gain 1 Energy.", 2, A, RA, SE, 20, 0, 0, 0, false, false, 6, 0, 0, 0, 0, YUM)
 
 	# ============================================================
 	# BANNER (samurai commander) — tank, AOE debuffs, strength
@@ -350,6 +361,17 @@ func _create_cards_in_code() -> void:
 	all_cards["hold_the_line"] = _make_card("hold_the_line", "Hold The Line", "Gain {B} Block.", 2, S, RA, SL, 0, 25, 0, 0, false, false, 0, 8, 0, 0, 0, BAN)
 	all_cards["war_banner"] = _make_card("war_banner", "War Banner", "POWER: At the start of each turn, apply {M} Vulnerable to ALL enemies.", 3, P, RA, SL, 0, 0, 1, 0, false, false, 0, 0, 0, 1, 0, BAN)
 	all_cards["decimate"] = _make_card("decimate", "Decimate", "Deal {D} damage to ALL enemies.", 3, A, RA, AE, 18, 0, 0, 0, false, false, 6, 0, 0, 0, 0, BAN)
+	# Extended Banner pool — more build variety (fortress / rally / commander)
+	all_cards["shield_wall"] = _make_card("shield_wall", "Shield Wall", "Gain {B} Block.", 1, S, CO, SL, 0, 8, 0, 0, false, false, 0, 4, 0, 0, 0, BAN)
+	all_cards["war_shout"] = _make_card("war_shout", "War Shout", "Apply {M} Weak to ALL enemies.", 1, S, CO, AE, 0, 0, 1, 0, false, false, 0, 0, 0, 1, 0, BAN)
+	all_cards["hammer_down"] = _make_card("hammer_down", "Hammer Down", "Deal {D} damage.\nGain {B} Block.", 1, A, CO, SE, 9, 2, 0, 0, false, false, 3, 2, 0, 0, 0, BAN)
+	all_cards["shove"] = _make_card("shove", "Shove", "Deal {D} damage.\nGain {B} Block.", 1, A, CO, SE, 5, 5, 0, 0, false, false, 2, 2, 0, 0, 0, BAN)
+	all_cards["reinforce"] = _make_card("reinforce", "Reinforce", "Gain {B} Block.\nGain {M} Strength.", 2, S, UC, SL, 0, 14, 1, 0, false, false, 0, 4, 0, 1, 0, BAN)
+	all_cards["scorch"] = _make_card("scorch", "Scorch", "Deal {D} damage to ALL enemies.", 2, A, UC, AE, 10, 0, 0, 0, false, false, 4, 0, 0, 0, 0, BAN)
+	all_cards["taunt"] = _make_card("taunt", "Taunt", "Apply {M} Weak to ALL enemies.", 1, S, UC, AE, 0, 0, 2, 0, false, false, 0, 0, 0, 1, 0, BAN)
+	all_cards["iron_hide"] = _make_card("iron_hide", "Iron Hide", "Gain {B} Block.\nGain {M} Strength.", 1, S, UC, SL, 0, 10, 1, 0, false, false, 0, 4, 0, 1, 0, BAN)
+	all_cards["final_command"] = _make_card("final_command", "Final Command", "Deal {D} damage to ALL enemies.\nApply {M} Vulnerable to ALL enemies.", 2, A, RA, AE, 14, 0, 1, 0, false, false, 5, 0, 0, 1, 0, BAN)
+	all_cards["onslaught"] = _make_card("onslaught", "Onslaught", "Deal {D} damage.\nApply {M} Weak.", 3, A, RA, SE, 24, 0, 2, 0, false, false, 8, 0, 0, 1, 0, BAN)
 
 	# ============================================================
 	# Legacy Ironclad-flavored pool — tagged RONIN (sword/strength theme)
@@ -396,6 +418,24 @@ func _create_cards_in_code() -> void:
 	all_cards["dazed"] = _make_card("dazed", "Dazed", "Unplayable. Ethereal.", 99, CardData.CardType.STATUS, CardData.CardRarity.SPECIAL, SL, 0, 0, 0, 0, false, true)
 	all_cards["burn"] = _make_card("burn", "Burn", "Unplayable.\nAt end of turn, take 2 damage.", 99, CardData.CardType.STATUS, CardData.CardRarity.SPECIAL, SL, 0, 0, 2)
 	all_cards["curse_pain"] = _make_card("curse_pain", "Pain", "While in hand, lose 1 HP when another card is played.", 99, CardData.CardType.CURSE, CardData.CardRarity.SPECIAL, SL, 0, 0, 1)
+
+
+func _make_enemy(id: String, ename: String, etype: EnemyData.EnemyType,
+		hp_min: int, hp_max: int, col: Color, pattern: String,
+		moves_arr: Array, sprite: String = "") -> EnemyData:
+	if all_enemies.has(id):
+		return all_enemies[id]
+	var e = EnemyData.new()
+	e.id = id
+	e.enemy_name = ename
+	e.enemy_type = etype
+	e.min_hp = hp_min
+	e.max_hp = hp_max
+	e.color = col
+	e.ai_pattern = pattern
+	e.moves = moves_arr
+	e.idle_sprite_path = sprite
+	return e
 
 
 func _create_enemies_in_code() -> void:
@@ -565,6 +605,138 @@ func _create_enemies_in_code() -> void:
 		{"name": "Tackle", "type": "attack", "damage": 12, "block": 0, "times": 2}
 	]
 	all_enemies["hexaghost"] = hexaghost
+
+	# ============================================================
+	# ROBOTS — mechanical, armoured feel
+	# ============================================================
+	var N = EnemyData.EnemyType.NORMAL
+	var EL = EnemyData.EnemyType.ELITE
+	var BO = EnemyData.EnemyType.BOSS
+
+	all_enemies["robot_swordsman"] = _make_enemy(
+		"robot_swordsman", "Iron Swordsman", N, 50, 56,
+		Color(0.5, 0.55, 0.65), "sequential",
+		[
+			{"name": "Slash", "type": "attack", "damage": 12, "block": 0, "times": 1},
+			{"name": "Charge", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 1, "times": 1},
+			{"name": "Slash", "type": "attack", "damage": 12, "block": 0, "times": 1},
+			{"name": "Guard", "type": "defend", "damage": 0, "block": 10, "times": 1}
+		],
+		"res://assets/enemis/mobs/robots/Swordsman/Idle.png"
+	)
+
+	all_enemies["robot_infantryman"] = _make_enemy(
+		"robot_infantryman", "Infantryman", N, 38, 44,
+		Color(0.45, 0.5, 0.6), "random_no_repeat",
+		[
+			{"name": "Shot", "type": "attack", "damage": 5, "block": 0, "times": 3},
+			{"name": "Aim", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 1, "times": 1},
+			{"name": "Cover", "type": "defend", "damage": 0, "block": 8, "times": 1}
+		],
+		"res://assets/enemis/mobs/robots/Infantryman/Idle.png"
+	)
+
+	all_enemies["robot_destroyer"] = _make_enemy(
+		"robot_destroyer", "Destroyer", EL, 90, 100,
+		Color(0.35, 0.4, 0.5), "sequential",
+		[
+			{"name": "Power Up", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 2, "times": 1},
+			{"name": "Heavy Slam", "type": "attack", "damage": 22, "block": 0, "times": 1},
+			{"name": "Shield Mode", "type": "defend", "damage": 0, "block": 14, "times": 1},
+			{"name": "Blast", "type": "attack", "damage": 10, "block": 0, "times": 2}
+		],
+		"res://assets/enemis/mobs/robots/Destroyer/Idle.png"
+	)
+
+	# ============================================================
+	# VAMPIRES — life drain, weakness debuffs
+	# ============================================================
+	all_enemies["vampire_girl"] = _make_enemy(
+		"vampire_girl", "Vampire Girl", N, 42, 48,
+		Color(0.55, 0.15, 0.35), "random_no_repeat",
+		[
+			{"name": "Scratch", "type": "attack", "damage": 8, "block": 0, "times": 1},
+			{"name": "Hiss", "type": "debuff", "damage": 0, "block": 0, "effect_name": "weak", "effect_value": 1, "times": 1},
+			{"name": "Blood Drain", "type": "attack_debuff", "damage": 6, "block": 0, "effect_name": "vulnerable", "effect_value": 1, "times": 1}
+		],
+		"res://assets/enemis/mobs/vamps/Vampire_Girl/Idle.png"
+	)
+
+	all_enemies["converted_vampire"] = _make_enemy(
+		"converted_vampire", "Converted Vampire", N, 52, 58,
+		Color(0.5, 0.1, 0.3), "sequential",
+		[
+			{"name": "Claw", "type": "attack", "damage": 10, "block": 0, "times": 1},
+			{"name": "Blood Rush", "type": "attack_debuff", "damage": 12, "block": 0, "effect_name": "vulnerable", "effect_value": 1, "times": 1},
+			{"name": "Claw", "type": "attack", "damage": 10, "block": 0, "times": 1}
+		],
+		"res://assets/enemis/mobs/vamps/Converted_Vampire/Idle.png"
+	)
+
+	all_enemies["countess_vampire"] = _make_enemy(
+		"countess_vampire", "Countess Vampire", EL, 78, 86,
+		Color(0.6, 0.05, 0.25), "sequential",
+		[
+			{"name": "Mesmerize", "type": "debuff", "damage": 0, "block": 0, "effect_name": "weak", "effect_value": 2, "times": 1},
+			{"name": "Slash", "type": "attack", "damage": 18, "block": 0, "times": 1},
+			{"name": "Blood Surge", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 2, "times": 1},
+			{"name": "Grand Slash", "type": "attack", "damage": 22, "block": 0, "times": 1}
+		],
+		"res://assets/enemis/mobs/vamps/Countess_Vampire/Idle.png"
+	)
+
+	# ============================================================
+	# YOUKAI — supernatural, curse and fear
+	# ============================================================
+	all_enemies["gotoku"] = _make_enemy(
+		"gotoku", "Gotoku", N, 40, 46,
+		Color(0.25, 0.45, 0.35), "sequential",
+		[
+			{"name": "Scratch", "type": "attack", "damage": 7, "block": 0, "times": 1},
+			{"name": "Scream", "type": "debuff", "damage": 0, "block": 0, "effect_name": "weak", "effect_value": 2, "times": 1},
+			{"name": "Lunge", "type": "attack", "damage": 10, "block": 0, "times": 1}
+		],
+		"res://assets/enemis/mobs/youkai/Gotoku/Idle.png"
+	)
+
+	all_enemies["onre"] = _make_enemy(
+		"onre", "Onre", N, 44, 50,
+		Color(0.2, 0.35, 0.5), "random_no_repeat",
+		[
+			{"name": "Curse", "type": "debuff", "damage": 0, "block": 0, "effect_name": "vulnerable", "effect_value": 2, "times": 1},
+			{"name": "Spirit Strike", "type": "attack", "damage": 11, "block": 0, "times": 1},
+			{"name": "Float", "type": "defend", "damage": 0, "block": 10, "times": 1}
+		],
+		"res://assets/enemis/mobs/youkai/Onre/Idle.png"
+	)
+
+	all_enemies["yurei"] = _make_enemy(
+		"yurei", "Yurei", EL, 85, 95,
+		Color(0.15, 0.3, 0.55), "sequential",
+		[
+			{"name": "Wail", "type": "debuff", "damage": 0, "block": 0, "effect_name": "weak", "effect_value": 2, "times": 1},
+			{"name": "Surge", "type": "attack", "damage": 6, "block": 0, "times": 3},
+			{"name": "Charge Up", "type": "buff", "damage": 0, "block": 8, "effect_name": "strength", "effect_value": 2, "times": 1},
+			{"name": "Strike", "type": "attack", "damage": 16, "block": 0, "times": 1}
+		],
+		"res://assets/enemis/mobs/youkai/Yurei/Idle.png"
+	)
+
+	# ============================================================
+	# BOSS — NightBorne
+	# ============================================================
+	all_enemies["nightborne"] = _make_enemy(
+		"nightborne", "NightBorne", BO, 300, 320,
+		Color(0.1, 0.05, 0.2), "sequential",
+		[
+			{"name": "Shadow Aura", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 2, "times": 1},
+			{"name": "Night Slash", "type": "attack", "damage": 22, "block": 0, "times": 1},
+			{"name": "Drain Soul", "type": "attack_debuff", "damage": 16, "block": 0, "effect_name": "vulnerable", "effect_value": 1, "times": 1},
+			{"name": "Dark Wave", "type": "attack", "damage": 8, "block": 0, "times": 3},
+			{"name": "Shadow Shroud", "type": "buff", "damage": 0, "block": 18, "effect_name": "strength", "effect_value": 1, "times": 1}
+		],
+		"res://assets/enemis/bosses/NightBorne/NightBorne.png"
+	)
 
 
 func _create_relics_in_code() -> void:

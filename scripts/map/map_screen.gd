@@ -1,12 +1,19 @@
 extends Control
 ## Displays the procedural map and handles node selection.
-## Styled after STS2: parchment background, icon nodes, dashed lines, legend.
 
 const CARD_UI_SCENE = preload("res://scenes/ui/card_ui.tscn")
+
+const NODE_SIZE   := 88
+const FLOOR_STEP  := 130.0
+const MAP_W       := 1100.0
+const NODE_SPACE  := 200.0
 
 var map_data: Array = []
 var current_floor: int = 0
 var deck_overlay_open: bool = false
+
+# PNG icon textures keyed by MapGenerator.NodeType
+var _icon_textures: Dictionary = {}
 
 @onready var map_container: Control = $ScrollContainer/MapContainer
 @onready var scroll_container: ScrollContainer = $ScrollContainer
@@ -27,6 +34,8 @@ func _ready() -> void:
 	deck_close_button.pressed.connect(_close_deck_overlay)
 	deck_overlay.visible = false
 
+	_load_icons()
+
 	if GameManager.map_data.is_empty():
 		GameManager.map_data = MapGenerator.generate_act(GameManager.current_act)
 
@@ -40,11 +49,10 @@ func _ready() -> void:
 	# Scroll to current floor area
 	await get_tree().process_frame
 	await get_tree().process_frame
-	var target_scroll = scroll_container.get_v_scroll_bar().max_value
+	var target_scroll := scroll_container.get_v_scroll_bar().max_value
 	if current_floor > 0:
-		var floor_spacing = 120.0
-		var map_height = map_data.size() * floor_spacing
-		target_scroll = max(0, map_height - current_floor * floor_spacing - 300)
+		var map_height := map_data.size() * FLOOR_STEP
+		target_scroll = max(0, map_height - current_floor * FLOOR_STEP - 300)
 	scroll_container.scroll_vertical = int(target_scroll)
 
 	# Fade in
@@ -74,159 +82,201 @@ func _update_relics() -> void:
 		relic_container.add_child(relic_label)
 
 
+func _load_icons() -> void:
+	# Sprite sheet: monster | chest(shop) | ?(event) | elite | boss
+	var sheet_path := "res://assets/icons/monster,chest,questionmark,elite,boss.png"
+	var sheet_img: Image
+	if ResourceLoader.exists(sheet_path):
+		var t = load(sheet_path)
+		if t is Texture2D:
+			sheet_img = t.get_image()
+	if not sheet_img:
+		sheet_img = Image.load_from_file(ProjectSettings.globalize_path(sheet_path))
+
+	if sheet_img and not sheet_img.is_empty():
+		var fw := sheet_img.get_width() / 5
+		var fh := sheet_img.get_height()
+		var types := [
+			MapGenerator.NodeType.MONSTER,
+			MapGenerator.NodeType.SHOP,
+			MapGenerator.NodeType.EVENT,
+			MapGenerator.NodeType.ELITE,
+			MapGenerator.NodeType.BOSS,
+		]
+		for i in range(5):
+			var crop := sheet_img.get_region(Rect2i(i * fw, 0, fw, fh))
+			_icon_textures[types[i]] = ImageTexture.create_from_image(crop)
+
+	var rest_path := "res://assets/icons/rest.png"
+	var rest_img: Image
+	if ResourceLoader.exists(rest_path):
+		var t = load(rest_path)
+		if t is Texture2D:
+			rest_img = t.get_image()
+	if not rest_img:
+		rest_img = Image.load_from_file(ProjectSettings.globalize_path(rest_path))
+	if rest_img and not rest_img.is_empty():
+		_icon_textures[MapGenerator.NodeType.REST] = ImageTexture.create_from_image(rest_img)
+
+
 func _draw_map() -> void:
 	for child in map_container.get_children():
 		child.queue_free()
 
-	var floor_spacing = 120.0
-	var node_spacing = 200.0
-	var map_width = 1200.0
-	var start_y = (map_data.size()) * floor_spacing + 40
+	var start_y := map_data.size() * FLOOR_STEP + 40.0
+	map_container.custom_minimum_size = Vector2(MAP_W + 220, start_y + 80)
 
-	map_container.custom_minimum_size = Vector2(map_width, start_y + 100)
-
-	# Draw connections as dashed lines
+	# Connections
 	for floor_idx in range(map_data.size() - 1):
 		var floor_nodes = map_data[floor_idx]
-		var next_floor = map_data[floor_idx + 1]
+		var next_floor  = map_data[floor_idx + 1]
+		var half := NODE_SIZE / 2.0
 		for node in floor_nodes:
-			var from_pos = Vector2(
-				_node_x(node["index"], floor_nodes.size(), map_width, node_spacing) + 25,
-				start_y - floor_idx * floor_spacing
+			var from_pos := Vector2(
+				_node_x(node["index"], floor_nodes.size()) + half,
+				start_y - floor_idx * FLOOR_STEP + half
 			)
 			for conn_idx in node.get("connections_to", []):
 				if conn_idx < next_floor.size():
-					var to_pos = Vector2(
-						_node_x(conn_idx, next_floor.size(), map_width, node_spacing) + 25,
-						start_y - (floor_idx + 1) * floor_spacing + 50
+					var to_pos := Vector2(
+						_node_x(conn_idx, next_floor.size()) + half,
+						start_y - (floor_idx + 1) * FLOOR_STEP + half
 					)
+					_draw_connection(from_pos, to_pos, _is_connection_on_path(floor_idx, node, conn_idx))
 
-					var on_path = _is_connection_on_path(floor_idx, node, conn_idx)
-					_draw_dashed_line(from_pos, to_pos, on_path)
-
-	# Draw floor labels on the left
-	for floor_idx in range(map_data.size()):
-		var y = start_y - floor_idx * floor_spacing
-		var floor_lbl = Label.new()
-		if floor_idx == 0:
-			floor_lbl.text = ""
-		elif floor_idx == map_data.size() - 1:
-			floor_lbl.text = "BOSS"
-			floor_lbl.add_theme_color_override("font_color", Color(0.8, 0.25, 0.2, 0.8))
-			floor_lbl.add_theme_font_size_override("font_size", 13)
+	# Floor number labels (left gutter)
+	for floor_idx in range(1, map_data.size()):
+		var y := start_y - floor_idx * FLOOR_STEP + NODE_SIZE / 2.0 - 8
+		var lbl := Label.new()
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		if floor_idx == map_data.size() - 1:
+			lbl.text = "BOSS"
+			lbl.add_theme_font_size_override("font_size", 11)
+			lbl.add_theme_color_override("font_color", Color(0.85, 0.25, 0.2, 0.7))
 		else:
-			floor_lbl.text = str(floor_idx)
-		floor_lbl.position = Vector2(-10, y + 12)
-		if floor_lbl.text != "BOSS":
-			floor_lbl.add_theme_font_size_override("font_size", 11)
-			floor_lbl.add_theme_color_override("font_color", Color(0.35, 0.3, 0.25, 0.5))
-		floor_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		map_container.add_child(floor_lbl)
+			lbl.text = str(floor_idx)
+			lbl.add_theme_font_size_override("font_size", 11)
+			lbl.add_theme_color_override("font_color", Color(0.4, 0.36, 0.3, 0.45))
+		lbl.position = Vector2(8, y)
+		map_container.add_child(lbl)
 
-	# Draw nodes as icons
+	# Nodes
 	for floor_idx in range(map_data.size()):
-		var floor_nodes = map_data[floor_idx]
-		for node in floor_nodes:
-			var x = _node_x(node["index"], floor_nodes.size(), map_width, node_spacing)
-			var y = start_y - floor_idx * floor_spacing
-			_create_map_node_icon(node, Vector2(x, y), floor_idx)
-
-	# Draw legend panel
-	_draw_legend(Vector2(map_width + 30, start_y - (map_data.size() / 2) * floor_spacing))
+		for node in map_data[floor_idx]:
+			var x := _node_x(node["index"], map_data[floor_idx].size())
+			var y := start_y - floor_idx * FLOOR_STEP
+			_create_map_node(node, Vector2(x, y), floor_idx)
 
 
-func _draw_dashed_line(from: Vector2, to: Vector2, on_path: bool) -> void:
-	# Create a dashed line effect using multiple small Line2D segments
-	var direction = (to - from)
-	var length = direction.length()
-	var norm = direction.normalized()
-	var dash_length = 8.0
-	var gap_length = 6.0
-	var traveled = 0.0
 
-	# Create a slight curve through a midpoint
-	var mid = (from + to) / 2.0
-	var perp = Vector2(-norm.y, norm.x)
-	mid += perp * (to.x - from.x) * 0.08  # Slight curve
+func _node_x(index: int, count: int) -> float:
+	var total := count * NODE_SPACE
+	var offset := (MAP_W - total) / 2.0 + 40.0
+	return offset + index * NODE_SPACE
 
-	while traveled < length:
-		var t1 = traveled / length
-		var t2 = minf((traveled + dash_length) / length, 1.0)
 
-		# Quadratic bezier interpolation
-		var p1_a = from.lerp(mid, t1)
-		var p1_b = mid.lerp(to, t1)
-		var point1 = p1_a.lerp(p1_b, t1)
+func _draw_connection(from: Vector2, to: Vector2, on_path: bool) -> void:
+	var dir  := to - from
+	var len  := dir.length()
+	var norm := dir.normalized()
+	var perp := Vector2(-norm.y, norm.x)
+	var mid  := (from + to) / 2.0 + perp * (to.x - from.x) * 0.07
 
-		var p2_a = from.lerp(mid, t2)
-		var p2_b = mid.lerp(to, t2)
-		var point2 = p2_a.lerp(p2_b, t2)
+	var dash := 7.0
+	var gap  := 5.0
+	var t    := 0.0
 
-		var seg = Line2D.new()
-		seg.add_point(point1)
-		seg.add_point(point2)
+	while t < len:
+		var t1 := t / len
+		var t2 := minf((t + dash) / len, 1.0)
+		var p1 := from.lerp(mid, t1).lerp(mid.lerp(to, t1), t1)
+		var p2 := from.lerp(mid, t2).lerp(mid.lerp(to, t2), t2)
 
+		var seg := Line2D.new()
+		seg.add_point(p1)
+		seg.add_point(p2)
 		if on_path:
-			seg.default_color = Color(0.75, 0.6, 0.25, 0.85)
-			seg.width = 3.0
+			seg.default_color = Color(0.88, 0.68, 0.22, 0.9)
+			seg.width = 3.5
 		else:
-			seg.default_color = Color(0.4, 0.35, 0.3, 0.35)
+			seg.default_color = Color(0.38, 0.33, 0.28, 0.28)
 			seg.width = 1.5
 		map_container.add_child(seg)
-
-		traveled += dash_length + gap_length
+		t += dash + gap
 
 
 func _draw_legend(pos: Vector2) -> void:
-	var panel = ColorRect.new()
-	panel.position = pos
-	panel.size = Vector2(170, 240)
-	panel.color = Color(0.85, 0.8, 0.7, 0.15)
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	map_container.add_child(panel)
+	var bg := ColorRect.new()
+	bg.position = pos
+	bg.size = Vector2(160, 230)
+	bg.color = Color(0.06, 0.05, 0.09, 0.82)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	map_container.add_child(bg)
 
-	var title = Label.new()
+	# thin border
+	for side in [Vector2(0,0), Vector2(159,0), Vector2(0,229), Vector2(159,229)]:
+		pass  # skip — ColorRect only; a real border would need StyleBox
+
+	var title := Label.new()
 	title.text = "Legend"
-	title.position = pos + Vector2(15, 10)
-	title.add_theme_font_size_override("font_size", 18)
-	title.add_theme_color_override("font_color", Color(0.6, 0.55, 0.45))
+	title.position = pos + Vector2(12, 8)
+	title.add_theme_font_size_override("font_size", 15)
+	title.add_theme_color_override("font_color", Color(0.65, 0.6, 0.5, 0.9))
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	map_container.add_child(title)
 
-	var entries = [
-		[_get_node_icon(MapGenerator.NodeType.EVENT), "Unknown", MapGenerator.get_node_type_color(MapGenerator.NodeType.EVENT)],
-		[_get_node_icon(MapGenerator.NodeType.SHOP), "Merchant", MapGenerator.get_node_type_color(MapGenerator.NodeType.SHOP)],
-		[_get_node_icon(MapGenerator.NodeType.REST), "Rest", MapGenerator.get_node_type_color(MapGenerator.NodeType.REST)],
-		[_get_node_icon(MapGenerator.NodeType.MONSTER), "Enemy", MapGenerator.get_node_type_color(MapGenerator.NodeType.MONSTER)],
-		[_get_node_icon(MapGenerator.NodeType.ELITE), "Elite", MapGenerator.get_node_type_color(MapGenerator.NodeType.ELITE)],
-		[_get_node_icon(MapGenerator.NodeType.BOSS), "Boss", MapGenerator.get_node_type_color(MapGenerator.NodeType.BOSS)],
+	var entries := [
+		[MapGenerator.NodeType.MONSTER, "Monster"],
+		[MapGenerator.NodeType.ELITE,   "Elite"],
+		[MapGenerator.NodeType.BOSS,    "Boss"],
+		[MapGenerator.NodeType.REST,    "Rest Site"],
+		[MapGenerator.NodeType.SHOP,    "Merchant"],
+		[MapGenerator.NodeType.EVENT,   "Unknown"],
 	]
-
 	for i in range(entries.size()):
-		var entry = entries[i]
-		var y_off = 40 + i * 30
+		var ntype: MapGenerator.NodeType = entries[i][0]
+		var label_text: String = entries[i][1]
+		var col := MapGenerator.get_node_type_color(ntype)
+		var y_off := 34.0 + i * 32.0
 
-		var icon_lbl = Label.new()
-		icon_lbl.text = entry[0]
-		icon_lbl.position = pos + Vector2(15, y_off)
-		icon_lbl.add_theme_font_size_override("font_size", 18)
-		icon_lbl.add_theme_color_override("font_color", entry[2])
-		icon_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		map_container.add_child(icon_lbl)
+		var icon_tex: Texture2D = _icon_textures.get(ntype, null)
+		if icon_tex:
+			var tr := TextureRect.new()
+			tr.texture = icon_tex
+			tr.position = pos + Vector2(10, y_off)
+			tr.size = Vector2(24, 24)
+			tr.custom_minimum_size = Vector2(24, 24)
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			map_container.add_child(tr)
+		else:
+			var fallback := Label.new()
+			fallback.text = _get_node_letter(ntype)
+			fallback.position = pos + Vector2(10, y_off)
+			fallback.add_theme_font_size_override("font_size", 16)
+			fallback.add_theme_color_override("font_color", col)
+			fallback.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			map_container.add_child(fallback)
 
-		var name_lbl = Label.new()
-		name_lbl.text = entry[1]
-		name_lbl.position = pos + Vector2(50, y_off + 2)
-		name_lbl.add_theme_font_size_override("font_size", 14)
-		name_lbl.add_theme_color_override("font_color", Color(0.55, 0.5, 0.4))
+		var name_lbl := Label.new()
+		name_lbl.text = label_text
+		name_lbl.position = pos + Vector2(40, y_off + 3)
+		name_lbl.add_theme_font_size_override("font_size", 13)
+		name_lbl.add_theme_color_override("font_color", col.lightened(0.15))
 		name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		map_container.add_child(name_lbl)
 
 
-func _node_x(index: int, count: int, total_width: float, spacing: float) -> float:
-	var total = count * spacing
-	var offset = (total_width - total) / 2.0
-	return offset + index * spacing
+func _get_node_letter(type: MapGenerator.NodeType) -> String:
+	match type:
+		MapGenerator.NodeType.MONSTER: return "M"
+		MapGenerator.NodeType.ELITE:   return "E"
+		MapGenerator.NodeType.REST:    return "R"
+		MapGenerator.NodeType.SHOP:    return "$"
+		MapGenerator.NodeType.EVENT:   return "?"
+		MapGenerator.NodeType.BOSS:    return "B"
+		_: return ""
 
 
 func _is_connection_on_path(floor_idx: int, node: Dictionary, target_idx: int) -> bool:
@@ -238,110 +288,100 @@ func _is_connection_on_path(floor_idx: int, node: Dictionary, target_idx: int) -
 	return false
 
 
-func _get_node_icon(type: MapGenerator.NodeType) -> String:
-	match type:
-		MapGenerator.NodeType.MONSTER: return "M"
-		MapGenerator.NodeType.ELITE: return "E"
-		MapGenerator.NodeType.REST: return "R"
-		MapGenerator.NodeType.SHOP: return "$"
-		MapGenerator.NodeType.EVENT: return "?"
-		MapGenerator.NodeType.BOSS: return "B"
-		MapGenerator.NodeType.START: return "S"
-		_: return ""
+func _create_map_node(node_data: Dictionary, pos: Vector2, floor_idx: int) -> void:
+	var type        := node_data["type"] as MapGenerator.NodeType
+	var type_color  := MapGenerator.get_node_type_color(type)
+	var is_visited: bool = node_data.get("visited", false)
+	var is_select:  bool = _is_node_selectable(floor_idx, node_data)
+	var half: float = NODE_SIZE / 2.0
 
-
-func _create_map_node_icon(node_data: Dictionary, pos: Vector2, floor_idx: int) -> void:
-	var type = node_data["type"] as MapGenerator.NodeType
-	var type_color = MapGenerator.get_node_type_color(type)
-	var icon_text = _get_node_icon(type)
-	var is_visited = node_data.get("visited", false)
-	var is_selectable = _is_node_selectable(floor_idx, node_data)
-
-	# Node container button
-	var btn = Button.new()
+	# --- Circle button ---
+	var btn := Button.new()
 	btn.position = pos
-	btn.size = Vector2(50, 50)
+	btn.size = Vector2(NODE_SIZE, NODE_SIZE)
 	btn.text = ""
+	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if is_select else Control.CURSOR_ARROW
 
-	# Create icon-style node
-	var style = StyleBoxFlat.new()
-	style.set_corner_radius_all(25)  # Circle
+	var style := StyleBoxFlat.new()
+	style.set_corner_radius_all(int(half))
 
 	if is_visited:
-		style.bg_color = Color(0.2, 0.18, 0.15, 0.5)
-		style.border_color = Color(0.35, 0.3, 0.25, 0.5)
+		style.bg_color = Color(0.12, 0.1, 0.1, 0.5)
+		style.border_color = Color(0.3, 0.27, 0.22, 0.4)
 		style.set_border_width_all(1)
 		btn.disabled = true
-	elif is_selectable:
-		style.bg_color = type_color.darkened(0.5)
+	elif is_select:
+		style.bg_color = type_color.darkened(0.55)
 		style.border_color = type_color
-		style.set_border_width_all(2)
+		style.set_border_width_all(3)
 		btn.pressed.connect(_on_map_node_pressed.bind(node_data, floor_idx))
 
-		# Pulse glow animation
-		var tween = create_tween().set_loops()
-		tween.tween_property(btn, "modulate:a", 0.65, 0.7)
-		tween.tween_property(btn, "modulate:a", 1.0, 0.7)
+		var hover := style.duplicate() as StyleBoxFlat
+		hover.bg_color = type_color.darkened(0.3)
+		hover.border_color = type_color.lightened(0.25)
+		hover.set_border_width_all(4)
+		var press := style.duplicate() as StyleBoxFlat
+		press.bg_color = type_color.darkened(0.15)
+		btn.add_theme_stylebox_override("hover",   hover)
+		btn.add_theme_stylebox_override("pressed", press)
+
+		# Subtle pulse
+		var tween := create_tween().set_loops()
+		tween.tween_property(btn, "modulate:a", 0.6, 0.8)
+		tween.tween_property(btn, "modulate:a", 1.0, 0.8)
 	else:
-		style.bg_color = Color(0.15, 0.13, 0.1, 0.35)
-		style.border_color = Color(0.25, 0.22, 0.18, 0.3)
+		style.bg_color = Color(0.1, 0.09, 0.08, 0.3)
+		style.border_color = Color(0.22, 0.2, 0.17, 0.25)
 		style.set_border_width_all(1)
 		btn.disabled = true
 
-	btn.add_theme_stylebox_override("normal", style)
+	btn.add_theme_stylebox_override("normal",   style)
 	btn.add_theme_stylebox_override("disabled", style)
-
-	# Hover style
-	if is_selectable:
-		var hover_style = style.duplicate()
-		hover_style.bg_color = type_color.darkened(0.25)
-		hover_style.border_color = type_color.lightened(0.2)
-		hover_style.set_border_width_all(3)
-		btn.add_theme_stylebox_override("hover", hover_style)
-
-		var pressed_style = style.duplicate()
-		pressed_style.bg_color = type_color.darkened(0.15)
-		btn.add_theme_stylebox_override("pressed", pressed_style)
-
+	btn.clip_contents = true
 	map_container.add_child(btn)
 
-	# Icon label on top
-	var icon_label = Label.new()
-	icon_label.text = icon_text
-	icon_label.position = pos
-	icon_label.size = Vector2(50, 50)
-	icon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	icon_label.add_theme_font_size_override("font_size", 22)
-	icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	if is_visited:
-		icon_label.add_theme_color_override("font_color", Color(0.4, 0.35, 0.3, 0.5))
-	elif is_selectable:
-		icon_label.add_theme_color_override("font_color", Color.WHITE)
-	else:
-		icon_label.add_theme_color_override("font_color", Color(0.45, 0.4, 0.35, 0.4))
-
-	map_container.add_child(icon_label)
-
-	# Type name below node (small, subtle)
-	if type != MapGenerator.NodeType.START:
-		var name_label = Label.new()
-		name_label.text = MapGenerator.get_node_type_name(type)
-		name_label.position = pos + Vector2(-10, 52)
-		name_label.size = Vector2(70, 20)
-		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_label.add_theme_font_size_override("font_size", 10)
-		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
+	# --- PNG icon inside the circle (child of btn so it's clipped to 62×62) ---
+	var icon_tex: Texture2D = _icon_textures.get(type, null)
+	if icon_tex:
+		var tr := TextureRect.new()
+		tr.texture = icon_tex
+		tr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 4)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		if is_visited:
-			name_label.add_theme_color_override("font_color", Color(0.35, 0.3, 0.25, 0.4))
-		elif is_selectable:
-			name_label.add_theme_color_override("font_color", type_color.lightened(0.1))
-		else:
-			name_label.add_theme_color_override("font_color", Color(0.35, 0.3, 0.25, 0.3))
+			tr.modulate = Color(0.5, 0.5, 0.5, 0.6)
+		elif not is_select:
+			tr.modulate = Color(0.85, 0.85, 0.85, 0.75)
+		btn.add_child(tr)
+	else:
+		# Fallback letter
+		var lbl := Label.new()
+		lbl.text = _get_node_letter(type)
+		lbl.position = pos
+		lbl.size = Vector2(NODE_SIZE, NODE_SIZE)
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.add_theme_font_size_override("font_size", 22)
+		lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		lbl.add_theme_color_override("font_color",
+			Color(0.38, 0.33, 0.28, 0.45) if is_visited else
+			(Color.WHITE if is_select else Color(0.42, 0.38, 0.33, 0.38)))
+		map_container.add_child(lbl)
 
-		map_container.add_child(name_label)
+	# --- Name label below ---
+	if type != MapGenerator.NodeType.START:
+		var name_lbl := Label.new()
+		name_lbl.text = MapGenerator.get_node_type_name(type)
+		name_lbl.position = pos + Vector2(-8, NODE_SIZE + 2)
+		name_lbl.size = Vector2(NODE_SIZE + 16, 18)
+		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_lbl.add_theme_font_size_override("font_size", 10)
+		name_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		name_lbl.add_theme_color_override("font_color",
+			Color(0.32, 0.28, 0.24, 0.38) if is_visited else
+			(type_color.lightened(0.1) if is_select else Color(0.32, 0.28, 0.24, 0.28)))
+		map_container.add_child(name_lbl)
 
 
 func _is_node_selectable(floor_idx: int, node_data: Dictionary) -> bool:

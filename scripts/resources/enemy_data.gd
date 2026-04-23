@@ -13,7 +13,10 @@ enum EnemyType { NORMAL, ELITE, BOSS }
 
 # Move pool - each move is a dictionary with: name, type, damage, block, effects
 # type can be: "attack", "defend", "buff", "debuff", "attack_debuff"
-@export var moves: Array[Dictionary] = []
+@export var moves: Array = []
 
 # AI pattern: "sequential", "random_no_repeat", "conditional"
 @export var ai_pattern: String = "sequential"
+
+# Optional idle sprite (res:// path to a PNG). If set, replaces the colored figure.
+@export var idle_sprite_path: String = ""
