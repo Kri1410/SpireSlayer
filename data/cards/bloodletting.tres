@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bloodletting"
+card_name = "Bloodletting"
+description = "Lose {M} HP. Gain 2 Energy."
+energy_cost = 0
+card_type = 1
+rarity = 2
+target_type = 2
+damage = 0
+block = 0
+magic_number = 3
+replay_count = 0
+exhaust = false
+ethereal = false
+innate = false
+upgraded = false
+upgrade_damage_bonus = 0
+upgrade_block_bonus = 0
+upgrade_cost_reduction = 0
+upgrade_magic_bonus = -1
+upgrade_replay_bonus = 0
+color = Color(1, 1, 1, 1)

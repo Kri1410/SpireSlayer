@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "gremlin_nob"
+enemy_name = "Gremlin Nob"
+enemy_type = 1
+min_hp = 82
+max_hp = 86
+color = Color(0.2, 0.5, 0.15, 1)
+moves = [{"name": "Bellow", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 2, "times": 1}, {"name": "Rush", "type": "attack", "damage": 14, "block": 0, "times": 1}, {"name": "Skull Bash", "type": "attack_debuff", "damage": 8, "block": 0, "effect_name": "vulnerable", "effect_value": 2, "times": 1}]
+ai_pattern = "sequential"

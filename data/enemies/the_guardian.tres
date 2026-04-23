@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "the_guardian"
+enemy_name = "The Guardian"
+enemy_type = 2
+min_hp = 240
+max_hp = 250
+color = Color(0.8, 0.7, 0.2, 1)
+moves = [{"name": "Fierce Bash", "type": "attack", "damage": 32, "block": 0, "times": 1}, {"name": "Vent Steam", "type": "debuff", "damage": 0, "block": 0, "effect_name": "weak", "effect_value": 2, "times": 1}, {"name": "Whirlwind", "type": "attack", "damage": 5, "block": 0, "times": 4}, {"name": "Defend Mode", "type": "defend", "damage": 0, "block": 20, "times": 1}]
+ai_pattern = "sequential"

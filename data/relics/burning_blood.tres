@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="RelicData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/relic_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "burning_blood"
+relic_name = "Burning Blood"
+description = "At the end of combat, heal 6 HP."
+rarity = 0
+color = Color(0.9, 0.2, 0.1, 1)
+trigger = "on_combat_end"
+effect_value = 6
+effect_type = "heal"

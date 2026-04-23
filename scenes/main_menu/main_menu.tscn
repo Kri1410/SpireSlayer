@@ -1,0 +1,296 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="ClassPanel"]
+bg_color = Color(0.07, 0.05, 0.09, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.18, 0.18, 0.85)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.04, 0.03, 0.07, 1)
+
+[node name="GradientOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -400.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0.15, 0.04, 0.02, 0.4)
+
+[node name="ParticleContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Title" type="Label" parent="UILayer"]
+offset_left = 0.0
+offset_top = 80.0
+offset_right = 1920.0
+offset_bottom = 180.0
+theme_override_colors/font_color = Color(0.95, 0.35, 0.15, 1)
+theme_override_font_sizes/font_size = 80
+text = "SPIRE SLAYER"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="UILayer"]
+offset_left = 0.0
+offset_top = 175.0
+offset_right = 1920.0
+offset_bottom = 215.0
+theme_override_colors/font_color = Color(0.55, 0.5, 0.65, 1)
+theme_override_font_sizes/font_size = 22
+text = "Choose your warrior"
+horizontal_alignment = 1
+
+[node name="ClassRow" type="HBoxContainer" parent="UILayer"]
+offset_left = 220.0
+offset_top = 260.0
+offset_right = 1700.0
+offset_bottom = 820.0
+theme_override_constants/separation = 60
+alignment = 1
+
+[node name="RoninPanel" type="Panel" parent="UILayer/ClassRow"]
+custom_minimum_size = Vector2(440, 540)
+layout_mode = 2
+theme_override_styles/panel = SubResource("ClassPanel")
+
+[node name="Sprite" type="TextureRect" parent="UILayer/ClassRow/RoninPanel"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 80.0
+offset_right = 380.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture_filter = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="UILayer/ClassRow/RoninPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 380.0
+offset_right = 440.0
+offset_bottom = 420.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.95, 0.65, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "THE RONIN"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="UILayer/ClassRow/RoninPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 425.0
+offset_right = 440.0
+offset_bottom = 455.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.8, 0.7, 1)
+theme_override_font_sizes/font_size = 17
+text = "HP 75   Energy 3"
+horizontal_alignment = 1
+
+[node name="Tagline" type="Label" parent="UILayer/ClassRow/RoninPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 460.0
+offset_right = 410.0
+offset_bottom = 530.0
+mouse_filter = 2
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 15
+text = "Disciplined swordsman.
+High single-target damage."
+horizontal_alignment = 1
+
+[node name="YumiPanel" type="Panel" parent="UILayer/ClassRow"]
+custom_minimum_size = Vector2(440, 540)
+layout_mode = 2
+theme_override_styles/panel = SubResource("ClassPanel")
+
+[node name="Sprite" type="TextureRect" parent="UILayer/ClassRow/YumiPanel"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 80.0
+offset_right = 380.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture_filter = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="UILayer/ClassRow/YumiPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 380.0
+offset_right = 440.0
+offset_bottom = 420.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.3, 0.25, 1)
+theme_override_font_sizes/font_size = 28
+text = "THE YUMI"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="UILayer/ClassRow/YumiPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 425.0
+offset_right = 440.0
+offset_bottom = 455.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.8, 0.7, 1)
+theme_override_font_sizes/font_size = 17
+text = "HP 65   Energy 3"
+horizontal_alignment = 1
+
+[node name="Tagline" type="Label" parent="UILayer/ClassRow/YumiPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 460.0
+offset_right = 410.0
+offset_bottom = 530.0
+mouse_filter = 2
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 15
+text = "Ranged hunter.
+Multi-hit shots and card draw."
+horizontal_alignment = 1
+
+[node name="BannerPanel" type="Panel" parent="UILayer/ClassRow"]
+custom_minimum_size = Vector2(440, 540)
+layout_mode = 2
+theme_override_styles/panel = SubResource("ClassPanel")
+
+[node name="Sprite" type="TextureRect" parent="UILayer/ClassRow/BannerPanel"]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 80.0
+offset_right = 380.0
+offset_bottom = 360.0
+mouse_filter = 2
+texture_filter = 0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="UILayer/ClassRow/BannerPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 380.0
+offset_right = 440.0
+offset_bottom = 420.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.2, 0.25, 1)
+theme_override_font_sizes/font_size = 28
+text = "THE BANNER"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="UILayer/ClassRow/BannerPanel"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 425.0
+offset_right = 440.0
+offset_bottom = 455.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.85, 0.8, 0.7, 1)
+theme_override_font_sizes/font_size = 17
+text = "HP 90   Energy 3"
+horizontal_alignment = 1
+
+[node name="Tagline" type="Label" parent="UILayer/ClassRow/BannerPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 460.0
+offset_right = 410.0
+offset_bottom = 530.0
+mouse_filter = 2
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 15
+text = "Stalwart commander.
+Tanky with party-wide debuffs."
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UILayer"]
+offset_left = 660.0
+offset_top = 870.0
+offset_right = 1260.0
+offset_bottom = 950.0
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="NewRunButton" type="Button" parent="UILayer/ButtonContainer"]
+custom_minimum_size = Vector2(340, 70)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.8, 1)
+theme_override_colors/font_hover_color = Color(1, 0.6, 0.3, 1)
+theme_override_font_sizes/font_size = 28
+text = "Begin Ascent"
+
+[node name="QuitButton" type="Button" parent="UILayer/ButtonContainer"]
+custom_minimum_size = Vector2(220, 70)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.55, 0.65, 1)
+theme_override_colors/font_hover_color = Color(0.9, 0.4, 0.3, 1)
+theme_override_font_sizes/font_size = 22
+text = "Quit"
+
+[node name="FlavorText" type="Label" parent="UILayer"]
+offset_left = 0.0
+offset_top = 1010.0
+offset_right = 1920.0
+offset_bottom = 1040.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.35, 0.3, 0.4, 0.6)
+theme_override_font_sizes/font_size = 15
+text = "\"The Spire calls to those who would dare ascend.\""
+horizontal_alignment = 1
+
+[node name="VersionLabel" type="Label" parent="UILayer"]
+offset_left = 20.0
+offset_top = 1040.0
+offset_right = 200.0
+offset_bottom = 1060.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.3, 0.3, 0.35, 0.5)
+theme_override_font_sizes/font_size = 13
+text = "v0.2 - Three Warriors"

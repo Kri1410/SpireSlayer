@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cultist"
+enemy_name = "Cultist"
+enemy_type = 0
+min_hp = 48
+max_hp = 54
+color = Color(0.5, 0.2, 0.6, 1)
+moves = [{"name": "Incantation", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 3, "times": 1}, {"name": "Dark Strike", "type": "attack", "damage": 6, "block": 0, "times": 1}]
+ai_pattern = "sequential"

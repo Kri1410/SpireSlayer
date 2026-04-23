@@ -1,0 +1,177 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/map/map_screen.gd" id="1"]
+
+[node name="MapScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.18, 0.16, 0.12, 1)
+
+[node name="ParchmentOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.65, 0.58, 0.48, 0.08)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 60.0
+offset_right = -50.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MapContainer" type="Control" parent="ScrollContainer"]
+custom_minimum_size = Vector2(1200, 1900)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="TopBar" type="ColorRect" parent="UILayer"]
+offset_right = 1920.0
+offset_bottom = 55.0
+mouse_filter = 2
+color = Color(0.08, 0.07, 0.12, 0.95)
+
+[node name="ActLabel" type="Label" parent="UILayer"]
+offset_left = 20.0
+offset_top = 12.0
+offset_right = 200.0
+offset_bottom = 48.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.9, 0.4, 0.2, 1)
+text = "Act 1"
+
+[node name="FloorLabel" type="Label" parent="UILayer"]
+offset_left = 220.0
+offset_top = 18.0
+offset_right = 400.0
+offset_bottom = 48.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+text = "Floor: 0"
+
+[node name="DeckButton" type="Button" parent="UILayer"]
+offset_left = 830.0
+offset_top = 8.0
+offset_right = 1090.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 18
+text = "Deck (10)"
+
+[node name="RelicContainer" type="HBoxContainer" parent="UILayer"]
+offset_left = 450.0
+offset_top = 16.0
+offset_right = 800.0
+offset_bottom = 46.0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="HPLabel" type="Label" parent="UILayer"]
+offset_left = 1480.0
+offset_top = 18.0
+offset_right = 1700.0
+offset_bottom = 48.0
+mouse_filter = 2
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
+text = "HP: 80/80"
+
+[node name="GoldLabel" type="Label" parent="UILayer"]
+offset_left = 1720.0
+offset_top = 18.0
+offset_right = 1900.0
+offset_bottom = 48.0
+mouse_filter = 2
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+text = "Gold: 99"
+
+[node name="DeckOverlay" type="Control" parent="UILayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false
+
+[node name="DimBg" type="ColorRect" parent="UILayer/DeckOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="PanelBg" type="ColorRect" parent="UILayer/DeckOverlay"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 70.0
+offset_right = 1820.0
+offset_bottom = 1010.0
+color = Color(0.1, 0.08, 0.15, 0.95)
+
+[node name="DeckCountLabel" type="Label" parent="UILayer/DeckOverlay"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 80.0
+offset_right = 500.0
+offset_bottom = 115.0
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.9, 0.8, 0.6, 1)
+text = "Deck (10 cards)"
+
+[node name="CloseButton" type="Button" parent="UILayer/DeckOverlay"]
+layout_mode = 0
+offset_left = 1720.0
+offset_top = 78.0
+offset_right = 1800.0
+offset_bottom = 112.0
+theme_override_font_sizes/font_size = 18
+text = "X"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UILayer/DeckOverlay"]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 125.0
+offset_right = 1810.0
+offset_bottom = 1000.0
+
+[node name="DeckGrid" type="GridContainer" parent="UILayer/DeckOverlay/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 8

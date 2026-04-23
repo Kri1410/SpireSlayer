@@ -1,0 +1,263 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/card_ui.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="UpgradeGlow"]
+bg_color = Color(0, 0.898039, 1, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0.898039, 1, 0.8)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0.898039, 1, 0.55)
+shadow_size = 14
+
+[sub_resource type="StyleBoxFlat" id="OuterFrame"]
+bg_color = Color(0.0588235, 0.0470588, 0.0666667, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.482353, 0.125, 0.125, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 6
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="ArtPanel"]
+bg_color = Color(0.156863, 0.117647, 0.196078, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="DescPanel"]
+bg_color = Color(0.0901961, 0.0666667, 0.117647, 0.96)
+border_width_top = 2
+border_color = Color(0.482353, 0.125, 0.125, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="TypeBannerAttack"]
+bg_color = Color(0.482353, 0.094, 0.094, 0.97)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="CostMedallion"]
+bg_color = Color(0.945098, 0.768627, 0.0588235, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.482353, 0.314, 0.0392, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="CostMedallionInner"]
+bg_color = Color(0.835294, 0.611765, 0.0392157, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="Gradient" id="ArtGradient"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.32, 0.18, 0.36, 1, 0.08, 0.05, 0.13, 1)
+
+[sub_resource type="GradientTexture2D" id="ArtGradientTex"]
+gradient = SubResource("ArtGradient")
+fill_to = Vector2(0, 1)
+
+[node name="CardUI" type="Control"]
+custom_minimum_size = Vector2(170, 240)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 170.0
+offset_bottom = 240.0
+pivot_offset = Vector2(85, 120)
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="UpgradeGlow" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = -6.0
+offset_top = -6.0
+offset_right = 176.0
+offset_bottom = 246.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("UpgradeGlow")
+
+[node name="OuterFrame" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 170.0
+offset_bottom = 240.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("OuterFrame")
+
+[node name="ArtPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 32.0
+offset_right = 162.0
+offset_bottom = 148.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("ArtPanel")
+
+[node name="ArtTexture" type="TextureRect" parent="ArtPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("ArtGradientTex")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ArtVignette" type="ColorRect" parent="ArtPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)
+
+[node name="TypeBanner" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 28.0
+offset_top = 132.0
+offset_right = 142.0
+offset_bottom = 156.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("TypeBannerAttack")
+
+[node name="TypeLabel" type="Label" parent="TypeBanner"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.85)
+text = "Attack"
+
+[node name="DescPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 156.0
+offset_right = 162.0
+offset_bottom = 232.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("DescPanel")
+
+[node name="DescriptionLabel" type="RichTextLabel" parent="DescPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+offset_left = 6.0
+offset_top = 4.0
+offset_right = -6.0
+offset_bottom = -4.0
+mouse_filter = 2
+bbcode_enabled = true
+text = "Deal [color=#e74c3c]6[/color] damage."
+fit_content = true
+scroll_active = false
+
+[node name="CardNameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 164.0
+offset_bottom = 30.0
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(1, 0.972549, 0.901961, 1)
+theme_override_constants/outline_size = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.95)
+text = "Strike"
+
+[node name="CostMedallion" type="Panel" parent="."]
+layout_mode = 0
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 36.0
+offset_bottom = 36.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("CostMedallion")
+
+[node name="CostInner" type="Panel" parent="CostMedallion"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 36.0
+offset_bottom = 36.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("CostMedallionInner")
+
+[node name="CostLabel" type="Label" parent="CostMedallion"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 3
+theme_override_colors/font_outline_color = Color(0.227451, 0.137255, 0.0235294, 1)
+text = "1"
+
+[node name="ReplayLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 6.0
+offset_right = 164.0
+offset_bottom = 30.0
+mouse_filter = 2
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.2, 0.9, 0.4, 1)
+theme_override_constants/outline_size = 3
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.9)
+text = "x2"
+visible = false

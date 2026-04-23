@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "louse_red"
+enemy_name = "Red Louse"
+enemy_type = 0
+min_hp = 10
+max_hp = 15
+color = Color(0.7, 0.3, 0.1, 1)
+moves = [{"name": "Bite", "type": "attack", "damage": 6, "block": 0, "times": 1}, {"name": "Grow", "type": "buff", "damage": 0, "block": 0, "effect_name": "strength", "effect_value": 3, "times": 1}]
+ai_pattern = "random_no_repeat"

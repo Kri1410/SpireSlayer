@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/card_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "uppercut"
+card_name = "Uppercut"
+description = "Deal {D} damage. Apply {M} Weak. Apply {M} Vulnerable."
+energy_cost = 2
+card_type = 0
+rarity = 2
+target_type = 0
+damage = 13
+block = 0
+magic_number = 1
+replay_count = 0
+exhaust = false
+ethereal = false
+innate = false
+upgraded = false
+upgrade_damage_bonus = 0
+upgrade_block_bonus = 0
+upgrade_cost_reduction = 0
+upgrade_magic_bonus = 1
+upgrade_replay_bonus = 0
+color = Color(1, 1, 1, 1)

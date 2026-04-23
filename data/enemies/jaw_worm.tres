@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "jaw_worm"
+enemy_name = "Jaw Worm"
+enemy_type = 0
+min_hp = 40
+max_hp = 44
+color = Color(0.6, 0.15, 0.15, 1)
+moves = [{"name": "Chomp", "type": "attack", "damage": 11, "block": 0, "times": 1}, {"name": "Thrash", "type": "attack", "damage": 7, "block": 0, "times": 1}, {"name": "Bellow", "type": "buff", "damage": 0, "block": 5, "effect_name": "strength", "effect_value": 3, "times": 1}]
+ai_pattern = "sequential"

@@ -1,0 +1,21 @@
+# Godot 4+ specific ignores
+.godot/
+.import/
+
+# Exported builds
+export/
+build/
+*.exe
+*.pck
+*.zip
+
+# Editor/OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
